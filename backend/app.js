@@ -14,11 +14,6 @@ app.use(cors({
     credentials: true,
 }));
 
-<<<<<<< HEAD
-console.log("Hiii")
-=======
-console.log("Hi")
->>>>>>> 3b1eff793cadbde99707b900d55f2dd7e59d08b5
 app.use('/api/v1/auth', require('./src/routes/authRoutes'));
 app.use('/api/v1/income', require('./src/routes/incomeRoutes'));
 app.use('/api/v1/expense', require('./src/routes/expenseRoutes'));
