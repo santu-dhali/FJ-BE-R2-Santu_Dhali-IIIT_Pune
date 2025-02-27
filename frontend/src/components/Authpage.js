@@ -27,7 +27,7 @@ const AuthPage = () => {
             : { username, email, password, confirmPassword };
 
         try {
-            const response = await axios.post(`http://localhost:5000/api/v1/auth/${endpoint}`, payload);
+            const response = await axios.post(`https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/auth/${endpoint}`, payload);
             console.log(`${isLogin ? 'Login' : 'Signup'} successful:`, response.data);
             console.log('Token:', response.data.existingUser.token);
             localStorage.setItem('token', response.data.existingUser.token);
