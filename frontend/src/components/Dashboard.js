@@ -44,10 +44,10 @@ const Dashboard = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 };
 
-                const incomeResponse = await axios.get('http://localhost:5000/api/v1/income/getIncome', config);
+                const incomeResponse = await axios.get('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/income/getIncome', config);
                 setIncomeData(incomeResponse.data.data);
 
-                const expenseResponse = await axios.get('http://localhost:5000/api/v1/expense/getExpense', config);
+                const expenseResponse = await axios.get('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/expense/getExpense', config);
                 setExpenseData(expenseResponse.data.data);
 
                 setLoading(false);
@@ -76,7 +76,7 @@ const Dashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
-            const response = await axios.post('http://localhost:5000/api/v1/income/addIncome', newIncome, config);
+            const response = await axios.post('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/income/addIncome', newIncome, config);
             setIncomeData([...incomeData, response.data.data]);
             setShowIncomeDialog(false);
         } catch (err) {
@@ -96,7 +96,7 @@ const Dashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
-            const response = await axios.post('http://localhost:5000/api/v1/expense/addExpense', newExpense, config);
+            const response = await axios.post('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/expense/addExpense', newExpense, config);
             setExpenseData([...expenseData, response.data.data]);
             setShowExpenseDialog(false);
         } catch (err) {
@@ -116,7 +116,7 @@ const Dashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
-            const response = await axios.put(`http://localhost:5000/api/v1/income/editIncome/${updatedIncome._id}`, updatedIncome, config);
+            const response = await axios.put(`https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/income/editIncome/${updatedIncome._id}`, updatedIncome, config);
             setIncomeData(incomeData.map((income) => (income._id === updatedIncome._id ? response.data.data : income)));
             setEditIncome(null);
         } catch (err) {
@@ -136,7 +136,7 @@ const Dashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
-            await axios.delete(`http://localhost:5000/api/v1/income/deleteIncome/${id}`, config);
+            await axios.delete(`https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/income/deleteIncome/${id}`, config);
             setIncomeData(incomeData.filter((income) => income._id !== id));
         } catch (err) {
             setError('Unable to delete income');
@@ -155,7 +155,7 @@ const Dashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
-            const response = await axios.put(`http://localhost:5000/api/v1/expense/editExpense/${updatedExpense._id}`, updatedExpense, config);
+            const response = await axios.put(`https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/expense/editExpense/${updatedExpense._id}`, updatedExpense, config);
             setExpenseData(expenseData.map((expense) => (expense._id === updatedExpense._id ? response.data.data : expense)));
             setEditExpense(null);
         } catch (err) {
@@ -175,7 +175,7 @@ const Dashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
-            await axios.delete(`http://localhost:5000/api/v1/expense/deleteExpense/${id}`, config);
+            await axios.delete(`https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/expense/deleteExpense/${id}`, config);
             setExpenseData(expenseData.filter((expense) => expense._id !== id));
         } catch (err) {
             setError('Unable to delete expense');
@@ -199,7 +199,7 @@ const Dashboard = () => {
                 params: { year: selectedYear, month: selectedMonth },
             };
 
-            const response = await axios.get('http://localhost:5000/api/v1/getReport', config);
+            const response = await axios.get('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/getReport', config);
             generatePDF(response.data.data);
             setShowDownloadModal(false);
         } catch (err) {

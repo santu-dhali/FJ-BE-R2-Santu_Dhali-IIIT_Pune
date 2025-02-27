@@ -28,7 +28,7 @@ const Profile = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 };
 
-                const response = await axios.get('http://localhost:5000/api/v1/getProfile', config);
+                const response = await axios.get('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/getProfile', config);
                 setUser(response.data.data);
             } catch (err) {
                 setError('Unable to fetch profile data');
@@ -61,7 +61,7 @@ const Profile = () => {
                 newPassword: showChangePassword ? newPassword : undefined,
             };
 
-            const response = await axios.put('http://localhost:5000/api/v1/updateProfile', payload, config);
+            const response = await axios.put('https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/updateProfile', payload, config);
             setSuccess('Profile updated successfully');
             setUser(response.data.data);
             setCurrentPassword('');
