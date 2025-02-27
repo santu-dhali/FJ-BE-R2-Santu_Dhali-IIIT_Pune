@@ -29,7 +29,7 @@ exports.signUp = async (req, res) => {
             })
         }
         const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = await User.create({username, email, password: hashedPassword});
+        let newUser = await User.create({username, email, password: hashedPassword});
 
         const payload = {
             email: newUser.email,
