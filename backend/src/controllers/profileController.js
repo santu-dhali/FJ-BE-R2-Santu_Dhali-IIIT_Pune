@@ -1,26 +1,20 @@
-const { pool } = require('../config/db'); // Import PostgreSQL connection
+const User = require('../model/User');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-// Get User Profile
 exports.getProfile = async (req, res) => {
     try {
-        const result = await pool.query(
-            `SELECT "userId", "username", "email", "createdAt" FROM "User" WHERE "userId" = $1`, 
-            [req.userId]
-        );
-
-        if (result.rows.length === 0) {
+        const user = await User.findOne(req.UserId).select('-password');
+        if (!user) {
             return res.status(404).json({
                 message: 'User not found',
                 success: false,
             });
         }
-
         res.status(200).json({
             message: 'Profile fetched successfully',
             success: true,
-            data: result.rows[0],
+            data: user,
         });
     } catch (error) {
         res.status(500).json({
@@ -31,27 +25,19 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// Update User Profile
 exports.updateProfile = async (req, res) => {
     const { username, email, currentPassword, newPassword } = req.body;
-
     try {
-        const userResult = await pool.query(
-            `SELECT "userId", "username", "email", "password" FROM "User" WHERE "userId" = $1`, 
-            [req.userId]
-        );
-
-        if (userResult.rows.length === 0) {
+        const user = await User.findOne(req.UserId);
+        if (!user) {
             return res.status(404).json({
                 message: 'User not found',
                 success: false,
             });
         }
 
-        let user = userResult.rows[0];
-        let updatedUsername = username || user.username;
-        let updatedEmail = email || user.email;
-        let updatedPassword = user.password; // Default to existing password
+        if (username) user.username = username;
+        if (email) user.email = email;
 
         if (currentPassword && newPassword) {
             const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -61,21 +47,14 @@ exports.updateProfile = async (req, res) => {
                     success: false,
                 });
             }
-            updatedPassword = await bcrypt.hash(newPassword, 12);
+            user.password = await bcrypt.hash(newPassword, 12);
         }
 
-        const updateResult = await pool.query(
-            `UPDATE "User" 
-             SET "username" = $1, "email" = $2, "password" = $3 
-             WHERE "userId" = $4 
-             RETURNING "userId", "username", "email", "createdAt"`,
-            [updatedUsername, updatedEmail, updatedPassword, req.userId]
-        );
-
+        await user.save();
         res.status(200).json({
             message: 'Profile updated successfully',
             success: true,
-            data: updateResult.rows[0],
+            data: user,
         });
     } catch (error) {
         res.status(500).json({
@@ -85,3 +64,4 @@ exports.updateProfile = async (req, res) => {
         });
     }
 };
+
