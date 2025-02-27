@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import "../design/AuthPage.css"
+import "../design/AuthPage.css";
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -10,7 +10,15 @@ const AuthPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [shouldNavigate, setShouldNavigate] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (shouldNavigate) {
+            console.log("Navigating to dashboard...");
+            navigate('/dashboard');
+        }
+    }, [shouldNavigate, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,10 +37,16 @@ const AuthPage = () => {
         try {
             const response = await axios.post(`https://fj-be-r2-santu-dhali-iiit-pune.onrender.com/api/v1/auth/${endpoint}`, payload);
             console.log(`${isLogin ? 'Login' : 'Signup'} successful:`, response.data);
-            console.log('Token:', response.data.existingUser.token);
-            localStorage.setItem('token', response.data.existingUser.token);
-            navigate('/dashboard');
+            
+            const token = isLogin ? response.data.existingUser?.token : response.data.user?.token;
+            if (token) {
+                localStorage.setItem('token', token);
+                setShouldNavigate(true);
+            } else {
+                setError("Token not received from server");
+            }
         } catch (err) {
+            console.error("Login/Signup failed: ", err);
             setError(err.response?.data?.message || `${isLogin ? 'Login' : 'Signup'} failed`);
         }
     };
@@ -46,41 +60,21 @@ const AuthPage = () => {
                     {!isLogin && (
                         <div className="form-group">
                             <label>Username:</label>
-                            <input
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
+                            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
                         </div>
                     )}
                     <div className="form-group">
                         <label>Email:</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                     </div>
                     <div className="form-group">
                         <label>Password:</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
                     {!isLogin && (
                         <div className="form-group">
                             <label>Confirm Password:</label>
-                            <input
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                            />
+                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                         </div>
                     )}
                     <button type="submit">{isLogin ? 'Login' : 'Sign Up'}</button>
