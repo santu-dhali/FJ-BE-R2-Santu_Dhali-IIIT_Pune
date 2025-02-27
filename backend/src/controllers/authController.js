@@ -31,10 +31,20 @@ exports.signUp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = await User.create({username, email, password: hashedPassword});
 
+        const payload = {
+            email: newUser.email,
+            id: newUser._id
+        }
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: '1d'});
+
+        newUser = newUser.toObject();
+        newUser.password = undefined;
+        newUser.token = token;
+
         return res.status(200).json({
             message: 'User created successfully',
             success: true,
-            data: newUser
+            user: newUser
         })
     }catch(error){
         return res.status(500).json({
