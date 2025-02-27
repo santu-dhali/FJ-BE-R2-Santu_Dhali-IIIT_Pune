@@ -10,7 +10,7 @@ PORT = process.env.PORT || 4000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://67c01bc6c56e078e449c8d86--fincancetrackr.netlify.app',
     credentials: true,
 }));
 
