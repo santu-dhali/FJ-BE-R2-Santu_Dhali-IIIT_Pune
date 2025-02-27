@@ -1,5 +1,4 @@
-const Income = require('../model/Income');
-const Expense = require('../model/Expense');
+const pool = require('../config/db');  // Ensure the correct path
 
 exports.generateMonthlyReport = async (req, res) => {
     const { year, month } = req.query;
@@ -11,50 +10,48 @@ exports.generateMonthlyReport = async (req, res) => {
                 success: false,
             });
         }
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0);
 
-        const incomes = await Income.find({
-            userId: req.userId,
-            date: { $gte: startDate, $lte: endDate },
-        });
+        const startDate = `${year}-${month}-01`;
+        const endDate = `${year}-${month}-31`;
 
-        const expenses = await Expense.find({
-            userId: req.userId,
-            date: { $gte: startDate, $lte: endDate },
-        });
+        const incomeQuery = `
+            SELECT source, amount, date, description 
+            FROM incomes 
+            WHERE user_id = $1 AND date BETWEEN $2 AND $3
+        `;
+        const expenseQuery = `
+            SELECT category, amount, date, description 
+            FROM expenses 
+            WHERE user_id = $1 AND date BETWEEN $2 AND $3
+        `;
+
+        const [incomeResult, expenseResult] = await Promise.all([
+            pool.query(incomeQuery, [req.userId, startDate, endDate]),
+            pool.query(expenseQuery, [req.userId, startDate, endDate])
+        ]);
+
+        const incomes = incomeResult.rows;
+        const expenses = expenseResult.rows;
 
         const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
         const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
         const netSavings = totalIncome - totalExpenses;
-
-        const report = {
-            year: parseInt(year),
-            month: parseInt(month),
-            totalIncome,
-            totalExpenses,
-            netSavings,
-            incomes: incomes.map(income => ({
-                source: income.source,
-                amount: income.amount,
-                date: income.date,
-                description: income.description,
-            })),
-            expenses: expenses.map(expense => ({
-                category: expense.category,
-                amount: expense.amount,
-                date: expense.date,
-                description: expense.description,
-            })),
-        };
 
         res.status(200).json({
             message: 'Monthly report generated successfully',
             success: true,
-            data: report,
+            data: {
+                year: parseInt(year),
+                month: parseInt(month),
+                totalIncome,
+                totalExpenses,
+                netSavings,
+                incomes,
+                expenses,
+            },
         });
     } catch (error) {
+        console.error('Error generating report:', error);
         res.status(500).json({
             message: 'Unable to generate report',
             success: false,
@@ -62,3 +59,4 @@ exports.generateMonthlyReport = async (req, res) => {
         });
     }
 };
+    
